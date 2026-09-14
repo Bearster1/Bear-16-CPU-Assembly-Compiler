@@ -15,13 +15,14 @@
 
 registers: List[str] = ["r0", "r1", "r2", "r3", "r4", "r5", "r6", "racc"]
 def cleanse(instruction: str) -> list[str] | None:
+    holdInstruction = instruction
     if ";" in instruction:
         commentPointer = instruction.index(";")
         instruction = instruction[:commentPointer]
     instruction = instruction.replace("  ", "").strip()
 
     if instruction == "":
-        print(f"Instruction is empty.")
+        print(f"Instruction: '{holdInstruction}' is empty.")
         return None
     instruction_list = instruction.split(" ")
     length = len(instruction_list)
@@ -141,13 +142,18 @@ def writeFile(fileName: str, codes: list[int]) -> None:
             pointer += 1
 
 def main():
+    attach_Path = True
+
     print("The Bear-16 Assembler")
 
     while True:
         fileName = input("Enter the name of the file you would like to load: ")
         try:
             print("Loading file...")
-            instructions = loadFile(fileName)
+            finalFileName = fileName
+            if attach_Path:
+                finalFileName = f"assembly/{fileName}"
+            instructions = loadFile(finalFileName)
             break
         except FileNotFoundError:
             print("This file does not exist.")
@@ -156,7 +162,9 @@ def main():
     codes = decode(instructions)
 
     print("Writing file...")
-    writeFile(fileName, codes)
+    if attach_Path:
+        finalFileName = f"machine code/{fileName}"
+    writeFile(finalFileName, codes)
 
     print("Complete!")
 
